@@ -9,23 +9,16 @@ contract HashToken is ERC20 {
     error HashToken__InvalidNonce();
     error HashToken__TimeRanOut();
 
+    event SuccessfulMint(address);
+
     uint256 immutable TOKENS_PER_MINT;
     uint256 public immutable DIFFICULTY;
 
     uint256 public TARGET;
     uint256 public COUNTER;
-    uint256 public TIME_UNTIL_MINING_IS_VALID;
+    uint256 public MINING_TIMEFRAME;
     uint256 public TIMESTAMP;
 
-    /*
-    @param tokensPerMint - numbers of tokens per single mint
-    @param miningTime - time during which minting is available
-    @param initialTarget - target selected by deployer, pass 0 too be randomly selected. The higher the target - the easier is to mine.
-    Do not pass arbitrary value unless you absolutely have to.
-    @param difficultyAdjustment - defines how hard mining would be. Pass 0 to set it to defaul value
-    By defalt it's 1 in  2 000 000(modern CPU generate 100 000 to 1 000 000 hashes per second).
-    Passing 1 makes solving almost trivial(1 in 2 chance for any given value of nonce)
-    */
     constructor(
         string memory name,
         string memory symbol,
@@ -35,7 +28,7 @@ contract HashToken is ERC20 {
         uint256 difficultyAdjustment
     ) ERC20(name, symbol) {
         TOKENS_PER_MINT = tokensPerMint;
-        TIME_UNTIL_MINING_IS_VALID = miningTime;
+        MINING_TIMEFRAME = miningTime;
         COUNTER = 1;
         TIMESTAMP = block.timestamp;
         if (difficultyAdjustment != 0) DIFFICULTY = difficultyAdjustment;
@@ -59,6 +52,7 @@ contract HashToken is ERC20 {
         _mint(msg.sender, TOKENS_PER_MINT);
         TARGET = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender))) / DIFFICULTY;
         ++COUNTER;
+        emit SuccessfulMint(msg.sender);
     }
 
     /*
@@ -66,7 +60,7 @@ contract HashToken is ERC20 {
     After enough time has passed this function will revert any call
     */
     function checkTime() internal {
-        if ((TIMESTAMP + TIME_UNTIL_MINING_IS_VALID) < block.timestamp) {
+        if ((TIMESTAMP + MINING_TIMEFRAME) < block.timestamp) {
             revert HashToken__TimeRanOut();
         } else {
             COUNTER = 1;
@@ -82,6 +76,10 @@ contract HashToken is ERC20 {
     }
 
     function getTimeLeft() public view returns (uint256) {
-        return (block.timestamp - (TIMESTAMP + TIME_UNTIL_MINING_IS_VALID));
+        if (block.timestamp >= TIMESTAMP + MINING_TIMEFRAME) {
+            return 0;
+        }
+
+        return (TIMESTAMP + MINING_TIMEFRAME) - block.timestamp;
     }
 }
