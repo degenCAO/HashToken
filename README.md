@@ -1,7 +1,8 @@
 ERC20 Hash is an thought experiment of ERC20 token with PoW mint function that converts used computational resources into a token.
 ERC20 mint() function has no difficulty changes over the course of time and depends solely on compute power spent.
 Idea is - every token is represantation of used compute power for token mints. To prevent token from beign endlessly more inflationary minting is limited in time.
-Thus at defined point in time token emission stops completely.
+Thus at defined point in time token emission stops completely,which flips economic model for token from inflationary to deflationary.
+That mechanic can be used for meme tokens/utility tokens.
 
 How it works?
 

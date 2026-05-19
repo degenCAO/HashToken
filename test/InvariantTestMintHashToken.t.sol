@@ -15,6 +15,9 @@ contract TestMintHashToken is StdInvariant, Test {
         tokenPerMint = 10e18;
 
         Deploy deploy = new Deploy();
+
+        //this setup gives roughly 18-19% chance on successful call,mainly because block.prevrandao and block.timestamp are constants.
+        //Or at least thats how I see it.
         hashToken = deploy.run("HashToken", "HSH", tokenPerMint, 1 days, 0, 1);
         targetContract(address(hashToken));
 
