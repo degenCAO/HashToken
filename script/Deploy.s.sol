@@ -14,6 +14,12 @@ contract Deploy is Script {
     @param difficultyAdjustment - defines how hard mining would be. Pass 0 to set it to defaul value
     By defalt it's 1 in  2 000 000(modern CPU generate 100 000 to 1 000 000 hashes per second).
     Passing 1 makes solving almost trivial(1 in 2 chance for any given value of nonce)
+    @param premintAddresses[] - array of addresses to receive tokens before mining starts.
+    Length of the array has to be the same as premintValues.
+    Leave 0 if yo don't want any premint.
+    @param premintValues[] - amount of tokens for each consecutive address in premintAddresses[].
+    Length of the array has to be the same as premintValues.
+    Leave 0 if yo don't want any premint.
     */
     function run(
         string memory name,
@@ -21,9 +27,20 @@ contract Deploy is Script {
         uint256 tokensPerMint,
         uint256 miningTime,
         uint256 initialTarget,
-        uint256 difficultyAdjustment
+        uint256 difficultyAdjustment,
+        uint256[] memory premintValues,
+        address[] memory premintAddresses
     ) external returns (HashToken) {
-        return deploy(name, symbol, tokensPerMint, miningTime, initialTarget, difficultyAdjustment);
+        return deploy(
+            name,
+            symbol,
+            tokensPerMint,
+            miningTime,
+            initialTarget,
+            difficultyAdjustment,
+            premintValues,
+            premintAddresses
+        );
     }
 
     function deploy(
@@ -32,11 +49,21 @@ contract Deploy is Script {
         uint256 tokensPerMint,
         uint256 miningTime,
         uint256 initialTarget,
-        uint256 difficultyAdjustment
+        uint256 difficultyAdjustment,
+        uint256[] memory premintValues,
+        address[] memory premintAddresses
     ) public returns (HashToken) {
         vm.startBroadcast();
-        HashToken hashToken =
-            new HashToken(name, symbol, tokensPerMint, miningTime, initialTarget, difficultyAdjustment);
+        HashToken hashToken = new HashToken(
+            name,
+            symbol,
+            tokensPerMint,
+            miningTime,
+            initialTarget,
+            difficultyAdjustment,
+            premintValues,
+            premintAddresses
+        );
         vm.stopBroadcast();
         return hashToken;
     }

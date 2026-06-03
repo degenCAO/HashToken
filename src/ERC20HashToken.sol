@@ -19,14 +19,23 @@ contract HashToken is ERC20 {
     uint256 public MINING_TIMEFRAME;
     uint256 public TIMESTAMP;
 
+    uint256[] public PREMINT_VALUES;
+    address[] public REMINT_ADDRESSES;
+
     constructor(
         string memory name,
         string memory symbol,
         uint256 tokensPerMint,
         uint256 miningTime,
         uint256 initialTarget,
-        uint256 difficultyAdjustment
+        uint256 difficultyAdjustment,
+        uint256[] memory premintValues,
+        address[] memory premintAddresses
     ) ERC20(name, symbol) {
+        if (premintValues.length != premintAddresses.length) revert();
+        for (uint256 i = 0; i < premintValues.length; i++) {
+            _mint(premintAddresses[i], premintValues[i]);
+        }
         TOKENS_PER_MINT = tokensPerMint;
         MINING_TIMEFRAME = miningTime;
         COUNTER = 1;
