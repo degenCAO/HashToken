@@ -44,7 +44,7 @@ contract HashToken is ERC20 {
         else DIFFICULTY = 1e6;
 
         if (initialTarget == 0) {
-            TARGET = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender))) / DIFFICULTY;
+            TARGET = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, address(block.coinbase)))) / DIFFICULTY;
         } else {
             TARGET = initialTarget;
         }
@@ -59,7 +59,7 @@ contract HashToken is ERC20 {
         if (uint256(keccak256(abi.encode(nonce, msg.sender))) > TARGET) revert HashToken__InvalidNonce();
 
         _mint(msg.sender, TOKENS_PER_MINT);
-        TARGET = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender))) / DIFFICULTY;
+        TARGET = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender, address(block.coinbase)))) / DIFFICULTY;
         ++COUNTER;
         emit SuccessfulMint(msg.sender);
     }
